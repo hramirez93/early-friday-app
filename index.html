@@ -5,76 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Early Friday Live</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-[#0f172a] text-slate-200 min-h-screen">
 
     <nav class="p-5 border-b border-slate-800 flex justify-between items-center px-8 bg-slate-900/50">
         <h1 class="text-xl font-bold text-white">🚀 EarlyFriday <span class="text-blue-500 text-sm font-normal">Live</span></h1>
-        <div id="status-dot" class="flex items-center gap-2 text-xs text-slate-400">
-            <span id="dot" class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> <span id="status-text">Conectando...</span>
+        <div id="status-dot" class="flex items-center gap-2 text-xs text-slate-400 font-mono">
+            <span id="dot" class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> <span id="status-text">Iniciando...</span>
         </div>
     </nav>
 
     <main class="max-w-4xl mx-auto p-6 space-y-6">
-        <div class="bg-slate-800/50 p-6 rounded-3xl border border-slate-700">
+        <div class="bg-slate-800/50 p-6 rounded-3xl border border-slate-700 shadow-2xl">
             <div class="grid md:grid-cols-3 gap-4">
-                <input id="userName" type="text" placeholder="Tu nombre" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 outline-none focus:border-blue-500 text-white">
-                <input id="userTask" type="text" placeholder="¿Qué terminaste?" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 outline-none focus:border-blue-500 text-white">
-                <button onclick="sendToCloud()" id="btn-send" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-xl transition-all disabled:opacity-50">
+                <input id="userName" type="text" placeholder="Tu nombre" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 text-white">
+                <input id="userTask" type="text" placeholder="¿Qué terminaste?" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 text-white">
+                <button onclick="sendToCloud()" id="btn-send" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-xl transition-all shadow-lg shadow-blue-500/20">
                     Enviar a la Nube
                 </button>
             </div>
         </div>
 
-        <div class="bg-slate-800/50 rounded-3xl border border-slate-700 overflow-hidden">
+        <div class="bg-slate-800/50 rounded-3xl border border-slate-700 overflow-hidden shadow-xl">
             <table class="w-full text-left">
-                <thead class="bg-slate-900 text-xs text-slate-500 uppercase">
+                <thead class="bg-slate-900/80 text-xs text-slate-500 uppercase tracking-wider">
                     <tr>
                         <th class="p-4">Persona</th>
                         <th class="p-4">Tarea</th>
                         <th class="p-4">Hora</th>
                     </tr>
                 </thead>
-                <tbody id="live-list" class="divide-y divide-slate-700">
+                <tbody id="live-list" class="divide-y divide-slate-800">
                     </tbody>
             </table>
         </div>
     </main>
 
     <script>
-        // REEMPLAZA CON TUS DATOS REALES AQUÍ
+        // --- TUS CREDENCIALES ---
         const SB_URL = "https://sexnefbexmhxnakihcov.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNleG5lZmJleG1oeG5ha2loY292Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNTM3MjMsImV4cCI6MjA4MzgyOTcyM30.QSpCGC-1-XzHil1YK15y0MntkPgC0WMzh_i4J-eiJ0I";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNleG5lZmJleG1oeG5ha2loY292Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNTM3MjMsImV4cCI6MjA4MzgyOTcyM30.QSpCGC-1-XzHil1YK15y0MntkPgC0WMzh_i4J-eiJ0I"; // Pega aquí tu key larga
+        // -------------------------
 
-        let supabase;
-
-        try {
-            supabase = window.supabase.createClient(SB_URL, SB_KEY);
-            console.log("Cliente Supabase inicializado");
-        } catch (e) {
-            alert("Error al cargar Supabase: " + e.message);
-        }
+        const { createClient } = supabase;
+        const _supabase = createClient(SB_URL, SB_KEY);
 
         async function loadData() {
             const dot = document.getElementById('dot');
             const statusText = document.getElementById('status-text');
 
             try {
-                const { data, error } = await supabase
+                const { data, error } = await _supabase
                     .from('registros')
                     .select('*')
                     .order('created_at', { ascending: false });
                 
                 if (error) throw error;
 
-                if (data) {
-                    render(data);
-                    dot.className = "w-2 h-2 bg-emerald-500 rounded-full";
-                    statusText.innerText = "Sincronizado";
-                }
+                render(data || []);
+                dot.className = "w-2 h-2 bg-emerald-500 rounded-full";
+                statusText.innerText = "Sincronizado";
             } catch (err) {
-                console.error(err);
+                console.error("Error de carga:", err);
                 dot.className = "w-2 h-2 bg-red-500 rounded-full animate-pulse";
                 statusText.innerText = "Error de conexión";
             }
@@ -85,13 +78,13 @@
             const task = document.getElementById('userTask').value;
             const btn = document.getElementById('btn-send');
 
-            if(!name || !task) return alert("Por favor escribe tu nombre y tarea");
+            if(!name || !task) return alert("Completa los campos, por favor");
 
             btn.disabled = true;
             btn.innerText = "Enviando...";
 
             try {
-                const { error } = await supabase
+                const { error } = await _supabase
                     .from('registros')
                     .insert([{ name, task }]);
 
@@ -100,7 +93,8 @@
                 document.getElementById('userTask').value = "";
                 await loadData(); 
             } catch (err) {
-                alert("No se pudo enviar: " + err.message);
+                alert("Error al enviar: " + err.message);
+                console.error(err);
             } finally {
                 btn.disabled = false;
                 btn.innerText = "Enviar a la Nube";
@@ -110,22 +104,21 @@
         function render(items) {
             const list = document.getElementById('live-list');
             if (items.length === 0) {
-                list.innerHTML = '<tr><td colspan="3" class="p-10 text-center text-slate-500">No hay registros hoy. ¡Sé el primero!</td></tr>';
+                list.innerHTML = '<tr><td colspan="3" class="p-10 text-center text-slate-600">No hay registros aún.</td></tr>';
                 return;
             }
             list.innerHTML = items.map(i => `
-                <tr class="hover:bg-slate-700/20">
-                    <td class="p-4 font-bold text-blue-400">${i.name}</td>
-                    <td class="p-4">${i.task}</td>
-                    <td class="p-4 text-xs text-slate-500">${new Date(i.created_at).toLocaleTimeString()}</td>
+                <tr class="hover:bg-slate-700/20 transition-colors">
+                    <td class="p-4 font-bold text-blue-400 italic">${i.name}</td>
+                    <td class="p-4 text-slate-300 font-medium">${i.task}</td>
+                    <td class="p-4 text-[10px] text-slate-500 font-mono">${new Date(i.created_at || Date.now()).toLocaleTimeString()}</td>
                 </tr>
             `).join('');
         }
 
-        // Ejecutar al cargar
+        // Carga inicial y auto-refresco
         loadData();
-        // Sincronizar cada 15 segundos
-        setInterval(loadData, 15000);
+        setInterval(loadData, 5000); // Se actualiza cada 5 segundos
     </script>
 </body>
 </html>
