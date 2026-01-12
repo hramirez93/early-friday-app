@@ -5,86 +5,140 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Early Friday Area</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .friday-glow { box-shadow: 0 0 20px rgba(52, 211, 153, 0.2); }
+    </style>
 </head>
-<body class="bg-slate-900 text-white min-h-screen font-sans">
+<body class="bg-[#0f172a] text-slate-200 min-h-screen font-sans antialiased">
 
-    <nav class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50 backdrop-blur-md sticky top-0">
-        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">🚀 Early Friday App</h1>
-        <span id="current-time" class="text-slate-400 text-sm"></span>
+    <nav class="p-5 glass sticky top-0 z-50 flex justify-between items-center px-8">
+        <div class="flex items-center gap-2">
+            <span class="text-2xl">🚀</span>
+            <h1 class="text-xl font-bold tracking-tight text-white">Early<span class="text-blue-500">Friday</span></h1>
+        </div>
+        <div id="current-time" class="font-mono text-sm bg-slate-800 px-3 py-1 rounded-full border border-slate-700"></div>
     </nav>
 
-    <main class="max-w-4xl mx-auto p-6 space-y-8">
+    <main class="max-w-5xl mx-auto p-6 space-y-6">
         
-        <section class="bg-slate-800 rounded-3xl p-8 border border-slate-700 shadow-xl text-center">
-            <h2 class="text-slate-400 uppercase tracking-widest text-sm font-semibold mb-2">Estado de la Semana</h2>
-            <div id="friday-status" class="text-3xl font-bold text-white">Cargando estado...</div>
+        <section id="status-card" class="glass rounded-3xl p-10 text-center transition-all duration-500">
+            <h2 class="text-slate-400 uppercase tracking-[0.2em] text-xs font-bold mb-3">Conteo Regresivo</h2>
+            <div id="friday-status" class="text-4xl md:text-5xl font-black text-white leading-tight"></div>
         </section>
 
-        <section class="bg-slate-800 rounded-3xl p-6 border border-slate-700">
-            <h3 class="text-xl font-bold mb-4">Registrar mi Salida</h3>
-            <div class="flex flex-col md:flex-row gap-4">
-                <input id="userName" type="text" placeholder="Tu nombre" class="bg-slate-700 border-none rounded-xl px-4 py-3 flex-1 focus:ring-2 focus:ring-blue-500 outline-none text-white">
-                <input id="userTask" type="text" placeholder="Actividad pendiente" class="bg-slate-700 border-none rounded-xl px-4 py-3 flex-1 focus:ring-2 focus:ring-blue-500 outline-none text-white">
-                <button onclick="addMember()" class="bg-blue-600 hover:bg-blue-500 px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-blue-900/20">Registrar</button>
+        <div class="grid md:grid-cols-3 gap-6">
+            <aside class="md:col-span-1 space-y-6">
+                <div class="glass rounded-3xl p-6">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <span>📝</span> Registrar Salida
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs text-slate-500 ml-1">Nombre Completo</label>
+                            <input id="userName" type="text" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-500 ml-1">Tarea Finalizada</label>
+                            <input id="userTask" type="text" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                        </div>
+                        <button onclick="addMember()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-blue-900/40 active:scale-95">
+                            Confirmar Registro
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="md:col-span-2">
+                <div class="glass rounded-3xl overflow-hidden">
+                    <div class="p-6 border-b border-slate-700 flex justify-between items-center">
+                        <h3 class="font-bold">Equipo Registrado</h3>
+                        <button onclick="clearList()" class="text-xs text-red-400 hover:text-red-300 transition">Borrar todo</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-800/50 text-xs uppercase text-slate-500">
+                                <tr>
+                                    <th class="p-4">Miembro</th>
+                                    <th class="p-4">Actividad</th>
+                                    <th class="p-4">Hora</th>
+                                </tr>
+                            </thead>
+                            <tbody id="members-list" class="divide-y divide-slate-800">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-        </section>
-
-        <section class="bg-slate-800 rounded-3xl overflow-hidden border border-slate-700">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-slate-700/50">
-                    <tr>
-                        <th class="p-4 text-slate-300 font-semibold">Miembro</th>
-                        <th class="p-4 text-slate-300 font-semibold">Estado</th>
-                        <th class="p-4 text-slate-300 font-semibold">Hora</th>
-                    </tr>
-                </thead>
-                <tbody id="members-list">
-                    </tbody>
-            </table>
-        </section>
-
+        </div>
     </main>
 
     <script>
-        // Lógica para el reloj y estado del viernes
-        function updateClock() {
+        let members = JSON.parse(localStorage.getItem('fridayMembers')) || [];
+
+        function updateUI() {
             const now = new Date();
-            const day = now.getDay(); // 5 es Viernes
+            const day = now.getDay();
             const hour = now.getHours();
             
-            document.getElementById('current-time').innerText = now.toLocaleString();
+            document.getElementById('current-time').innerText = now.toLocaleTimeString();
 
             const statusEl = document.getElementById('friday-status');
+            const card = document.getElementById('status-card');
+
             if (day === 5) {
-                statusEl.innerHTML = "🎉 ¡Hoy es Early Friday! <br> <span class='text-emerald-400 text-lg'>Prepara tus pendientes para salir temprano.</span>";
+                statusEl.innerHTML = "¡ES VIERNES! 🥳<br><span class='text-emerald-400 text-2xl font-medium'>Es hora de disfrutar el Early Friday</span>";
+                card.classList.add('friday-glow', 'border-emerald-500/30');
             } else {
-                statusEl.innerHTML = "👨‍💻 Trabajando duro... <br> <span class='text-blue-400 text-lg text-bold'>Faltan " + (5 - day) + " días para el viernes.</span>";
+                const daysLeft = 5 - day;
+                statusEl.innerHTML = `Faltan <span class="text-blue-500">${daysLeft}</span> días<br><span class="text-slate-500 text-2xl font-medium text-bold">para la libertad.</span>`;
+                card.classList.remove('friday-glow');
             }
+
+            renderMembers();
         }
 
         function addMember() {
             const name = document.getElementById('userName').value;
             const task = document.getElementById('userTask').value;
             
-            if (!name || !task) return alert("Por favor completa los campos");
+            if (!name || !task) return;
 
-            const list = document.getElementById('members-list');
-            const row = document.createElement('tr');
-            row.className = "border-t border-slate-700 hover:bg-slate-700/30 transition-colors";
-            row.innerHTML = `
-                <td class="p-4 font-medium">${name}</td>
-                <td class="p-4"><span class="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/20">Listo para salir</span></td>
-                <td class="p-4 text-slate-400 text-sm">${new Date().toLocaleTimeString()}</td>
-            `;
-            list.appendChild(row);
+            const newMember = {
+                name,
+                task,
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            };
+
+            members.push(newMember);
+            localStorage.setItem('fridayMembers', JSON.stringify(members));
             
-            // Limpiar inputs
             document.getElementById('userName').value = "";
             document.getElementById('userTask').value = "";
+            renderMembers();
         }
 
-        setInterval(updateClock, 1000);
-        updateClock();
+        function renderMembers() {
+            const list = document.getElementById('members-list');
+            list.innerHTML = members.map(m => `
+                <tr class="hover:bg-slate-800/30 transition-colors">
+                    <td class="p-4 font-semibold text-white">${m.name}</td>
+                    <td class="p-4 text-slate-400 text-sm">${m.task}</td>
+                    <td class="p-4"><span class="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-lg text-[10px] font-bold border border-blue-500/20">${m.time}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function clearList() {
+            if(confirm('¿Quieres limpiar la lista de hoy?')) {
+                members = [];
+                localStorage.removeItem('fridayMembers');
+                renderMembers();
+            }
+        }
+
+        setInterval(updateUI, 1000);
+        updateUI();
     </script>
 </body>
 </html>
