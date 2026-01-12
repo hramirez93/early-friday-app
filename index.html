@@ -3,32 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Early Friday Colaborativo</title>
+    <title>Early Friday Live</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-[#0f172a] text-slate-200 min-h-screen">
 
     <nav class="p-5 border-b border-slate-800 flex justify-between items-center px-8 bg-slate-900/50">
         <h1 class="text-xl font-bold text-white">🚀 EarlyFriday <span class="text-blue-500 text-sm font-normal">Live</span></h1>
         <div id="status-dot" class="flex items-center gap-2 text-xs text-slate-400">
-            <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> Desconectado
+            <span id="dot" class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> <span id="status-text">Conectando...</span>
         </div>
     </nav>
 
     <main class="max-w-4xl mx-auto p-6 space-y-6">
         <div class="bg-slate-800/50 p-6 rounded-3xl border border-slate-700">
             <div class="grid md:grid-cols-3 gap-4">
-                <input id="userName" type="text" placeholder="Tu nombre" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 outline-none focus:border-blue-500">
-                <input id="userTask" type="text" placeholder="¿Qué terminaste?" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 outline-none focus:border-blue-500">
-                <button onclick="sendToCloud()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-xl transition-all">Enviar a la Nube</button>
+                <input id="userName" type="text" placeholder="Tu nombre" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 outline-none focus:border-blue-500 text-white">
+                <input id="userTask" type="text" placeholder="¿Qué terminaste?" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 outline-none focus:border-blue-500 text-white">
+                <button onclick="sendToCloud()" id="btn-send" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-xl transition-all disabled:opacity-50">
+                    Enviar a la Nube
+                </button>
             </div>
         </div>
 
         <div class="bg-slate-800/50 rounded-3xl border border-slate-700 overflow-hidden">
             <table class="w-full text-left">
-                <thead class="bg-slate-900">
-                    <tr class="text-xs text-slate-500 uppercase">
+                <thead class="bg-slate-900 text-xs text-slate-500 uppercase">
+                    <tr>
                         <th class="p-4">Persona</th>
                         <th class="p-4">Tarea</th>
                         <th class="p-4">Hora</th>
@@ -41,63 +43,89 @@
     </main>
 
     <script>
-        // CONFIGURACIÓN (REEMPLAZA ESTO CON TUS DATOS DE SUPABASE)
+        // REEMPLAZA CON TUS DATOS REALES AQUÍ
         const SB_URL = "https://sexnefbexmhxnakihcov.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNleG5lZmJleG1oeG5ha2loY292Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNTM3MjMsImV4cCI6MjA4MzgyOTcyM30.QSpCGC-1-XzHil1YK15y0MntkPgC0WMzh_i4J-eiJ0I";
-        
-        const supabase = supabase.createClient(SB_URL, SB_KEY);
 
-        // 1. Cargar datos existentes
-        async function loadData() {
-            const { data, error } = await supabase
-                .from('registros')
-                .select('*')
-                .order('created_at', { ascending: false });
-            
-            if (data) render(data);
-            updateStatus(true);
+        let supabase;
+
+        try {
+            supabase = window.supabase.createClient(SB_URL, SB_KEY);
+            console.log("Cliente Supabase inicializado");
+        } catch (e) {
+            alert("Error al cargar Supabase: " + e.message);
         }
 
-        // 2. Enviar nuevo registro
+        async function loadData() {
+            const dot = document.getElementById('dot');
+            const statusText = document.getElementById('status-text');
+
+            try {
+                const { data, error } = await supabase
+                    .from('registros')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+
+                if (data) {
+                    render(data);
+                    dot.className = "w-2 h-2 bg-emerald-500 rounded-full";
+                    statusText.innerText = "Sincronizado";
+                }
+            } catch (err) {
+                console.error(err);
+                dot.className = "w-2 h-2 bg-red-500 rounded-full animate-pulse";
+                statusText.innerText = "Error de conexión";
+            }
+        }
+
         async function sendToCloud() {
             const name = document.getElementById('userName').value;
             const task = document.getElementById('userTask').value;
+            const btn = document.getElementById('btn-send');
 
-            if(!name || !task) return alert("Llena los campos");
+            if(!name || !task) return alert("Por favor escribe tu nombre y tarea");
 
-            const { error } = await supabase
-                .from('registros')
-                .insert([{ name: name, task: task }]);
+            btn.disabled = true;
+            btn.innerText = "Enviando...";
 
-            if (error) alert("Error: " + error.message);
-            else {
+            try {
+                const { error } = await supabase
+                    .from('registros')
+                    .insert([{ name, task }]);
+
+                if (error) throw error;
+                
                 document.getElementById('userTask').value = "";
-                loadData(); // Recargar lista
+                await loadData(); 
+            } catch (err) {
+                alert("No se pudo enviar: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Enviar a la Nube";
             }
         }
 
         function render(items) {
             const list = document.getElementById('live-list');
+            if (items.length === 0) {
+                list.innerHTML = '<tr><td colspan="3" class="p-10 text-center text-slate-500">No hay registros hoy. ¡Sé el primero!</td></tr>';
+                return;
+            }
             list.innerHTML = items.map(i => `
-                <tr>
-                    <td class="p-4 font-bold">${i.name}</td>
-                    <td class="p-4 text-slate-400">${i.task}</td>
+                <tr class="hover:bg-slate-700/20">
+                    <td class="p-4 font-bold text-blue-400">${i.name}</td>
+                    <td class="p-4">${i.task}</td>
                     <td class="p-4 text-xs text-slate-500">${new Date(i.created_at).toLocaleTimeString()}</td>
                 </tr>
             `).join('');
         }
 
-        function updateStatus(online) {
-            const dot = document.getElementById('status-dot');
-            dot.innerHTML = online ? 
-                '<span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Sincronizado' : 
-                '<span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> Desconectado';
-        }
-
-        // Cargar al iniciar
+        // Ejecutar al cargar
         loadData();
-        // Recargar cada 10 segundos para ver cambios de otros
-        setInterval(loadData, 10000);
+        // Sincronizar cada 15 segundos
+        setInterval(loadData, 15000);
     </script>
 </body>
 </html>
