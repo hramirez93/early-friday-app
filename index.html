@@ -6,18 +6,85 @@
     <title>Early Friday Area</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-900 text-white flex items-center justify-center h-screen">
-    <div class="text-center p-8 bg-slate-800 rounded-2xl shadow-2xl border border-blue-500/30">
-        <h1 class="text-4xl font-bold mb-4 text-blue-400">🚀 Early Friday App</h1>
-        <p class="text-slate-300 text-lg mb-6">El sistema está listo para ser desarrollado.</p>
-        <div class="flex gap-4 justify-center">
-            <button class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-lg font-semibold transition">
-                Ver Miembros
-            </button>
-            <button class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded-lg font-semibold transition">
-                Configuración
-            </button>
-        </div>
-    </div>
+<body class="bg-slate-900 text-white min-h-screen font-sans">
+
+    <nav class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50 backdrop-blur-md sticky top-0">
+        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">🚀 Early Friday App</h1>
+        <span id="current-time" class="text-slate-400 text-sm"></span>
+    </nav>
+
+    <main class="max-w-4xl mx-auto p-6 space-y-8">
+        
+        <section class="bg-slate-800 rounded-3xl p-8 border border-slate-700 shadow-xl text-center">
+            <h2 class="text-slate-400 uppercase tracking-widest text-sm font-semibold mb-2">Estado de la Semana</h2>
+            <div id="friday-status" class="text-3xl font-bold text-white">Cargando estado...</div>
+        </section>
+
+        <section class="bg-slate-800 rounded-3xl p-6 border border-slate-700">
+            <h3 class="text-xl font-bold mb-4">Registrar mi Salida</h3>
+            <div class="flex flex-col md:flex-row gap-4">
+                <input id="userName" type="text" placeholder="Tu nombre" class="bg-slate-700 border-none rounded-xl px-4 py-3 flex-1 focus:ring-2 focus:ring-blue-500 outline-none text-white">
+                <input id="userTask" type="text" placeholder="Actividad pendiente" class="bg-slate-700 border-none rounded-xl px-4 py-3 flex-1 focus:ring-2 focus:ring-blue-500 outline-none text-white">
+                <button onclick="addMember()" class="bg-blue-600 hover:bg-blue-500 px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-blue-900/20">Registrar</button>
+            </div>
+        </section>
+
+        <section class="bg-slate-800 rounded-3xl overflow-hidden border border-slate-700">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-slate-700/50">
+                    <tr>
+                        <th class="p-4 text-slate-300 font-semibold">Miembro</th>
+                        <th class="p-4 text-slate-300 font-semibold">Estado</th>
+                        <th class="p-4 text-slate-300 font-semibold">Hora</th>
+                    </tr>
+                </thead>
+                <tbody id="members-list">
+                    </tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <script>
+        // Lógica para el reloj y estado del viernes
+        function updateClock() {
+            const now = new Date();
+            const day = now.getDay(); // 5 es Viernes
+            const hour = now.getHours();
+            
+            document.getElementById('current-time').innerText = now.toLocaleString();
+
+            const statusEl = document.getElementById('friday-status');
+            if (day === 5) {
+                statusEl.innerHTML = "🎉 ¡Hoy es Early Friday! <br> <span class='text-emerald-400 text-lg'>Prepara tus pendientes para salir temprano.</span>";
+            } else {
+                statusEl.innerHTML = "👨‍💻 Trabajando duro... <br> <span class='text-blue-400 text-lg text-bold'>Faltan " + (5 - day) + " días para el viernes.</span>";
+            }
+        }
+
+        function addMember() {
+            const name = document.getElementById('userName').value;
+            const task = document.getElementById('userTask').value;
+            
+            if (!name || !task) return alert("Por favor completa los campos");
+
+            const list = document.getElementById('members-list');
+            const row = document.createElement('tr');
+            row.className = "border-t border-slate-700 hover:bg-slate-700/30 transition-colors";
+            row.innerHTML = `
+                <td class="p-4 font-medium">${name}</td>
+                <td class="p-4"><span class="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/20">Listo para salir</span></td>
+                <td class="p-4 text-slate-400 text-sm">${new Date().toLocaleTimeString()}</td>
+            `;
+            list.appendChild(row);
+            
+            // Limpiar inputs
+            document.getElementById('userName').value = "";
+            document.getElementById('userTask').value = "";
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
 </body>
 </html>
