@@ -3,142 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Early Friday Area</title>
+    <title>Early Friday Colaborativo</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
-        .friday-glow { box-shadow: 0 0 20px rgba(52, 211, 153, 0.2); }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-[#0f172a] text-slate-200 min-h-screen font-sans antialiased">
+<body class="bg-[#0f172a] text-slate-200 min-h-screen">
 
-    <nav class="p-5 glass sticky top-0 z-50 flex justify-between items-center px-8">
-        <div class="flex items-center gap-2">
-            <span class="text-2xl">🚀</span>
-            <h1 class="text-xl font-bold tracking-tight text-white">Early<span class="text-blue-500">Friday</span></h1>
+    <nav class="p-5 border-b border-slate-800 flex justify-between items-center px-8 bg-slate-900/50">
+        <h1 class="text-xl font-bold text-white">🚀 EarlyFriday <span class="text-blue-500 text-sm font-normal">Live</span></h1>
+        <div id="status-dot" class="flex items-center gap-2 text-xs text-slate-400">
+            <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> Desconectado
         </div>
-        <div id="current-time" class="font-mono text-sm bg-slate-800 px-3 py-1 rounded-full border border-slate-700"></div>
     </nav>
 
-    <main class="max-w-5xl mx-auto p-6 space-y-6">
-        
-        <section id="status-card" class="glass rounded-3xl p-10 text-center transition-all duration-500">
-            <h2 class="text-slate-400 uppercase tracking-[0.2em] text-xs font-bold mb-3">Conteo Regresivo</h2>
-            <div id="friday-status" class="text-4xl md:text-5xl font-black text-white leading-tight"></div>
-        </section>
-
-        <div class="grid md:grid-cols-3 gap-6">
-            <aside class="md:col-span-1 space-y-6">
-                <div class="glass rounded-3xl p-6">
-                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                        <span>📝</span> Registrar Salida
-                    </h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="text-xs text-slate-500 ml-1">Nombre Completo</label>
-                            <input id="userName" type="text" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-500 ml-1">Tarea Finalizada</label>
-                            <input id="userTask" type="text" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-                        </div>
-                        <button onclick="addMember()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-blue-900/40 active:scale-95">
-                            Confirmar Registro
-                        </button>
-                    </div>
-                </div>
-            </aside>
-
-            <div class="md:col-span-2">
-                <div class="glass rounded-3xl overflow-hidden">
-                    <div class="p-6 border-b border-slate-700 flex justify-between items-center">
-                        <h3 class="font-bold">Equipo Registrado</h3>
-                        <button onclick="clearList()" class="text-xs text-red-400 hover:text-red-300 transition">Borrar todo</button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-800/50 text-xs uppercase text-slate-500">
-                                <tr>
-                                    <th class="p-4">Miembro</th>
-                                    <th class="p-4">Actividad</th>
-                                    <th class="p-4">Hora</th>
-                                </tr>
-                            </thead>
-                            <tbody id="members-list" class="divide-y divide-slate-800">
-                                </tbody>
-                        </table>
-                    </div>
-                </div>
+    <main class="max-w-4xl mx-auto p-6 space-y-6">
+        <div class="bg-slate-800/50 p-6 rounded-3xl border border-slate-700">
+            <div class="grid md:grid-cols-3 gap-4">
+                <input id="userName" type="text" placeholder="Tu nombre" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 outline-none focus:border-blue-500">
+                <input id="userTask" type="text" placeholder="¿Qué terminaste?" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 outline-none focus:border-blue-500">
+                <button onclick="sendToCloud()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-xl transition-all">Enviar a la Nube</button>
             </div>
+        </div>
+
+        <div class="bg-slate-800/50 rounded-3xl border border-slate-700 overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="bg-slate-900">
+                    <tr class="text-xs text-slate-500 uppercase">
+                        <th class="p-4">Persona</th>
+                        <th class="p-4">Tarea</th>
+                        <th class="p-4">Hora</th>
+                    </tr>
+                </thead>
+                <tbody id="live-list" class="divide-y divide-slate-700">
+                    </tbody>
+            </table>
         </div>
     </main>
 
     <script>
-        let members = JSON.parse(localStorage.getItem('fridayMembers')) || [];
+        // CONFIGURACIÓN (REEMPLAZA ESTO CON TUS DATOS DE SUPABASE)
+        const SB_URL = "https://sexnefbexmhxnakihcov.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNleG5lZmJleG1oeG5ha2loY292Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNTM3MjMsImV4cCI6MjA4MzgyOTcyM30.QSpCGC-1-XzHil1YK15y0MntkPgC0WMzh_i4J-eiJ0I";
+        
+        const supabase = supabase.createClient(SB_URL, SB_KEY);
 
-        function updateUI() {
-            const now = new Date();
-            const day = now.getDay();
-            const hour = now.getHours();
+        // 1. Cargar datos existentes
+        async function loadData() {
+            const { data, error } = await supabase
+                .from('registros')
+                .select('*')
+                .order('created_at', { ascending: false });
             
-            document.getElementById('current-time').innerText = now.toLocaleTimeString();
-
-            const statusEl = document.getElementById('friday-status');
-            const card = document.getElementById('status-card');
-
-            if (day === 5) {
-                statusEl.innerHTML = "¡ES VIERNES! 🥳<br><span class='text-emerald-400 text-2xl font-medium'>Es hora de disfrutar el Early Friday</span>";
-                card.classList.add('friday-glow', 'border-emerald-500/30');
-            } else {
-                const daysLeft = 5 - day;
-                statusEl.innerHTML = `Faltan <span class="text-blue-500">${daysLeft}</span> días<br><span class="text-slate-500 text-2xl font-medium text-bold">para la libertad.</span>`;
-                card.classList.remove('friday-glow');
-            }
-
-            renderMembers();
+            if (data) render(data);
+            updateStatus(true);
         }
 
-        function addMember() {
+        // 2. Enviar nuevo registro
+        async function sendToCloud() {
             const name = document.getElementById('userName').value;
             const task = document.getElementById('userTask').value;
-            
-            if (!name || !task) return;
 
-            const newMember = {
-                name,
-                task,
-                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-            };
+            if(!name || !task) return alert("Llena los campos");
 
-            members.push(newMember);
-            localStorage.setItem('fridayMembers', JSON.stringify(members));
-            
-            document.getElementById('userName').value = "";
-            document.getElementById('userTask').value = "";
-            renderMembers();
+            const { error } = await supabase
+                .from('registros')
+                .insert([{ name: name, task: task }]);
+
+            if (error) alert("Error: " + error.message);
+            else {
+                document.getElementById('userTask').value = "";
+                loadData(); // Recargar lista
+            }
         }
 
-        function renderMembers() {
-            const list = document.getElementById('members-list');
-            list.innerHTML = members.map(m => `
-                <tr class="hover:bg-slate-800/30 transition-colors">
-                    <td class="p-4 font-semibold text-white">${m.name}</td>
-                    <td class="p-4 text-slate-400 text-sm">${m.task}</td>
-                    <td class="p-4"><span class="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-lg text-[10px] font-bold border border-blue-500/20">${m.time}</span></td>
+        function render(items) {
+            const list = document.getElementById('live-list');
+            list.innerHTML = items.map(i => `
+                <tr>
+                    <td class="p-4 font-bold">${i.name}</td>
+                    <td class="p-4 text-slate-400">${i.task}</td>
+                    <td class="p-4 text-xs text-slate-500">${new Date(i.created_at).toLocaleTimeString()}</td>
                 </tr>
             `).join('');
         }
 
-        function clearList() {
-            if(confirm('¿Quieres limpiar la lista de hoy?')) {
-                members = [];
-                localStorage.removeItem('fridayMembers');
-                renderMembers();
-            }
+        function updateStatus(online) {
+            const dot = document.getElementById('status-dot');
+            dot.innerHTML = online ? 
+                '<span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Sincronizado' : 
+                '<span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> Desconectado';
         }
 
-        setInterval(updateUI, 1000);
-        updateUI();
+        // Cargar al iniciar
+        loadData();
+        // Recargar cada 10 segundos para ver cambios de otros
+        setInterval(loadData, 10000);
     </script>
 </body>
 </html>
