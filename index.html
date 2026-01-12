@@ -3,192 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Early Friday Area | Live App</title>
+    <title>Early Friday Area | Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
-<body class="bg-[#0f172a] text-slate-200 min-h-screen">
+<body>
 
-    <nav class="p-5 glass sticky top-0 z-50 flex justify-between items-center px-8 border-b border-slate-800">
+    <nav class="p-4 glass sticky top-0 z-50 flex justify-between items-center px-8 border-b border-slate-800">
         <div class="flex items-center gap-2">
             <span class="text-2xl">🚀</span>
             <h1 class="text-xl font-bold tracking-tight text-white">Early<span class="text-blue-500">Friday</span></h1>
         </div>
-        <div id="status-dot" class="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold">
-            <span id="dot" class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-            <span id="status-text" class="text-slate-400">Desconectado</span>
+        
+        <div class="flex items-center gap-6">
+            <button onclick="loginJefe()" class="bg-slate-800 hover:bg-slate-700 text-[10px] px-3 py-1.5 rounded-lg border border-slate-700 transition font-bold text-slate-300">
+                🔑 ACCESO JEFE
+            </button>
+            <div id="status-dot" class="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold">
+                <span id="dot" class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                <span id="status-text" class="text-slate-500">Desconectado</span>
+            </div>
         </div>
     </nav>
 
-<main class="max-w-5xl mx-auto p-6 space-y-6">
-    
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="glass p-4 rounded-2xl border-l-4 border-blue-500">
-            <p class="text-xs text-slate-400 uppercase font-bold">Total Solicitudes</p>
-            <p id="stat-total" class="text-2xl font-bold text-white">0</p>
+    <main class="max-w-6xl mx-auto p-6 space-y-6">
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="glass p-5 rounded-3xl border-l-4 border-blue-500 shadow-xl">
+                <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Total Solicitudes</p>
+                <p id="stat-total" class="text-3xl font-bold text-white">0</p>
+            </div>
+            <div class="glass p-5 rounded-3xl border-l-4 border-emerald-500 shadow-xl">
+                <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Aprobadas</p>
+                <p id="stat-aprobadas" class="text-3xl font-bold text-emerald-400">0</p>
+            </div>
+            <div class="glass p-5 rounded-3xl border-l-4 border-amber-500 shadow-xl">
+                <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Pendientes</p>
+                <p id="stat-pendientes" class="text-3xl font-bold text-amber-400">0</p>
+            </div>
         </div>
-        <div class="glass p-4 rounded-2xl border-l-4 border-emerald-500">
-            <p class="text-xs text-slate-400 uppercase font-bold">Aprobadas</p>
-            <p id="stat-aprobadas" class="text-2xl font-bold text-emerald-400">0</p>
-        </div>
-        <div class="glass p-4 rounded-2xl border-l-4 border-amber-500">
-            <p class="text-xs text-slate-400 uppercase font-bold">Pendientes</p>
-            <p id="stat-pendientes" class="text-2xl font-bold text-amber-400">0</p>
-        </div>
-    </div>
 
-    <section class="glass rounded-3xl p-6 shadow-2xl">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1 ml-1">Mi Nombre</label>
-                <input id="userName" type="text" placeholder="Tu nombre" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500">
+        <section class="glass rounded-3xl p-6 shadow-2xl border border-slate-800">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1 ml-1">Mi Nombre</label>
+                    <input id="userName" type="text" placeholder="Tu nombre" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1 ml-1">Mi Equipo</label>
+                    <select id="userTeam" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="Hugo">Equipo Hugo</option>
+                        <option value="Elena">Equipo Elena</option>
+                        <option value="Carol">Equipo Carol</option>
+                        <option value="Malu">Equipo Malú / Annie</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1 ml-1">Tarea Finalizada</label>
+                    <input id="userTask" type="text" placeholder="¿Qué terminaste?" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex items-end">
+                    <button onclick="sendToCloud()" id="btn-send" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl transition-all shadow-lg shadow-blue-500/20 active:scale-95">
+                        Registrar Salida
+                    </button>
+                </div>
             </div>
-            <div>
-                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1 ml-1">Mi Equipo</label>
-                <select id="userTeam" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="Hugo">Equipo Hugo</option>
-                    <option value="Elena">Equipo Elena</option>
-                    <option value="Carol">Equipo Carol</option>
-                    <option value="Malu">Equipo Malú / Annie</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1 ml-1">Tarea Finalizada</label>
-                <input id="userTask" type="text" placeholder="¿Qué terminaste?" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div class="flex items-end">
-                <button onclick="sendToCloud()" id="btn-send" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-xl transition-all shadow-lg active:scale-95">
-                    Registrar Salida
-                </button>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="glass rounded-3xl overflow-hidden shadow-xl border border-slate-800">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left">
-                <thead class="bg-slate-900/50 text-[10px] uppercase text-slate-500 font-bold">
-                    <tr>
-                        <th class="p-4">Miembro / Equipo</th>
-                        <th class="p-4">Actividad</th>
-                        <th class="p-4 text-center">Estado</th>
-                        <th class="p-4 text-right">Hora</th>
-                    </tr>
-                </thead>
-                <tbody id="live-list" class="divide-y divide-slate-800"></tbody>
-            </table>
-        </div>
-    </section>
-</main>
+        <section class="glass rounded-3xl overflow-hidden shadow-xl border border-slate-800">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-900/80 text-[10px] uppercase text-slate-500 font-black tracking-tighter">
+                        <tr>
+                            <th class="p-5">Miembro / Equipo</th>
+                            <th class="p-5">Actividad Realizada</th>
+                            <th class="p-5 text-center">Estado de Salida</th>
+                            <th class="p-5 text-right">Hora Registro</th>
+                        </tr>
+                    </thead>
+                    <tbody id="live-list" class="divide-y divide-slate-800">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
 
     <script>
-        // --- CONFIGURACIÓN DE SUPABASE ---
+        // --- CREDENCIALES ---
         const SB_URL = "https://sexnefbexmhxnakihcov.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNleG5lZmJleG1oeG5ha2loY292Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNTM3MjMsImV4cCI6MjA4MzgyOTcyM30.QSpCGC-1-XzHil1YK15y0MntkPgC0WMzh_i4J-eiJ0I"; // REEMPLAZA ESTO
-        // ---------------------------------
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNleG5lZmJleG1oeG5ha2loY292Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNTM3MjMsImV4cCI6MjA4MzgyOTcyM30.QSpCGC-1-XzHil1YK15y0MntkPgC0WMzh_i4J-eiJ0I"; 
+        // --------------------
 
         const _supabase = supabase.createClient(SB_URL, SB_KEY);
+        let jefeActual = null;
 
-        // Función para cargar datos
-        // Actualiza tu función sendToCloud para incluir el equipo
-async function sendToCloud() {
-    let name = document.getElementById('userName').value.trim();
-    let task = document.getElementById('userTask').value.trim();
-    let equipo = document.getElementById('userTeam').value;
-    const btn = document.getElementById('btn-send');
+        // 1. Cargar Datos
+        async function loadData() {
+            const dot = document.getElementById('dot');
+            const statusText = document.getElementById('status-text');
 
-    if(!name || !task) return alert("Por favor completa todos los campos");
+            try {
+                const { data, error } = await _supabase
+                    .from('registros')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
 
-    btn.disabled = true;
-    btn.innerText = "🚀 Enviando...";
-
-    try {
-        const { error } = await _supabase
-            .from('registros')
-            .insert([{ 
-                name: name, 
-                task: task, 
-                equipo: equipo, 
-                estado: 'pendiente' // El valor que definimos
-            }]);
-
-        if (error) throw error;
-        
-        document.getElementById('userTask').value = "";
-        await loadData(); 
-    } catch (err) {
-        alert("Error: " + err.message);
-    } finally {
-        btn.disabled = false;
-        btn.innerText = "Registrar Salida";
-    }
-}
-
-// Actualiza la función render para mostrar los estados y equipos
-function render(items) {
-    const list = document.getElementById('live-list');
-    
-    // Actualizar Indicadores
-    document.getElementById('stat-total').innerText = items.length;
-    document.getElementById('stat-aprobadas').innerText = items.filter(i => i.estado === 'aprobado').length;
-    document.getElementById('stat-pendientes').innerText = items.filter(i => i.estado === 'pendiente').length;
-
-    if (items.length === 0) {
-        list.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-600 italic">No hay registros hoy.</td></tr>';
-        return;
-    }
-
-    list.innerHTML = items.map(i => {
-        let statusClass = "bg-amber-500/10 text-amber-500 border-amber-500/20";
-        if(i.estado === 'aprobado') statusClass = "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
-        
-        return `
-            <tr class="hover:bg-slate-700/20">
-                <td class="p-4">
-                    <div class="font-bold text-white">${i.name}</div>
-                    <div class="text-[10px] text-blue-400 uppercase font-bold">Equipo ${i.equipo}</div>
-                </td>
-                <td class="p-4 text-slate-300 text-sm">${i.task}</td>
-                <td class="p-4 text-center">
-                    <span class="px-3 py-1 rounded-full border text-[10px] font-bold ${statusClass}">
-                        ${i.estado.toUpperCase()}
-                    </span>
-                </td>
-                <td class="p-4 text-right text-[10px] font-mono text-slate-500">
-                    ${new Date(i.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
-                </td>
-            </tr>
-        `;
-    }).join('');
-}
-
-        // Lógica del mensaje de bienvenida según el día
-        function updateHeader() {
-            const now = new Date();
-            const day = now.getDay();
-            const msgEl = document.getElementById('friday-msg');
-            
-            if (day === 5) {
-                msgEl.innerText = "¡Llegó el Viernes! ✨";
-                msgEl.className = "text-3xl font-bold text-emerald-400 mb-2";
-            } else if (day === 4) {
-                msgEl.innerText = "Mañana es Early Friday... ⏳";
-            } else {
-                msgEl.innerText = "Preparando el Early Friday 👨‍💻";
+                render(data || []);
+                dot.className = "w-2 h-2 bg-emerald-500 rounded-full";
+                statusText.innerText = "Sincronizado";
+                statusText.className = "text-emerald-500";
+            } catch (err) {
+                console.error(err);
+                dot.className = "w-2 h-2 bg-red-500 rounded-full animate-pulse";
+                statusText.innerText = "Error de conexión";
             }
         }
 
-        // Inicialización
-        updateHeader();
+        // 2. Enviar Registro
+        async function sendToCloud() {
+            let name = document.getElementById('userName').value.trim();
+            let task = document.getElementById('userTask').value.trim();
+            let equipo = document.getElementById('userTeam').value;
+            const btn = document.getElementById('btn-send');
+
+            if(!name || !task) return alert("Completa todos los campos");
+
+            btn.disabled = true;
+            btn.innerText = "🚀 Enviando...";
+
+            try {
+                const { error } = await _supabase
+                    .from('registros')
+                    .insert([{ name, task, equipo, estado: 'pendiente' }]);
+
+                if (error) throw error;
+                document.getElementById('userTask').value = "";
+                await loadData();
+            } catch (err) {
+                alert("Error: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Registrar Salida";
+            }
+        }
+
+        // 3. Login de Jefe
+        function loginJefe() {
+            const pin = prompt("Ingresa tu PIN de Jefe:");
+            if (pin === "2026") { jefeActual = { nombre: "Malú", rol: "Super" }; alert("Bienvenida Malú"); }
+            else if (pin === "1111") { jefeActual = { nombre: "Hugo", equipo: "Hugo" }; alert("Hola Hugo"); }
+            else if (pin === "2222") { jefeActual = { nombre: "Elena", equipo: "Elena" }; alert("Hola Elena"); }
+            else if (pin === "3333") { jefeActual = { nombre: "Carol", equipo: "Carol" }; alert("Hola Carol"); }
+            else { alert("PIN Incorrecto"); jefeActual = null; }
+            loadData();
+        }
+
+        // 4. Función Aprobar
+        async function aprobar(id) {
+            if (!jefeActual) return;
+            try {
+                const { error } = await _supabase
+                    .from('registros')
+                    .update({ estado: 'aprobado', aprobado_por: jefeActual.nombre })
+                    .eq('id', id);
+                
+                if (error) throw error;
+                await loadData();
+            } catch (err) { alert(err.message); }
+        }
+
+        // 5. Dibujar Tabla
+        function render(items) {
+            const list = document.getElementById('live-list');
+            document.getElementById('stat-total').innerText = items.length;
+            document.getElementById('stat-aprobadas').innerText = items.filter(i => i.estado === 'aprobado').length;
+            document.getElementById('stat-pendientes').innerText = items.filter(i => i.estado === 'pendiente').length;
+
+            if (items.length === 0) {
+                list.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-600">No hay registros hoy.</td></tr>';
+                return;
+            }
+
+            list.innerHTML = items.map(i => {
+                let statusClass = i.estado === 'aprobado' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-amber-500/10 text-amber-500 border-amber-500/20";
+                
+                let btnAprobar = "";
+                if (jefeActual && i.estado === 'pendiente') {
+                    if (jefeActual.rol === "Super" || jefeActual.equipo === i.equipo) {
+                        btnAprobar = `<button onclick="aprobar('${i.id}')" class="ml-2 bg-emerald-600 hover:bg-emerald-500 text-white text-[9px] font-bold px-2 py-1 rounded shadow-lg transition-all active:scale-90">APROBAR ✅</button>`;
+                    }
+                }
+
+                return `
+                    <tr class="hover:bg-slate-700/20 transition-colors">
+                        <td class="p-4">
+                            <div class="font-bold text-white text-sm">${i.name}</div>
+                            <div class="text-[9px] text-blue-400 uppercase font-black tracking-tighter">EQUIPO ${i.equipo}</div>
+                        </td>
+                        <td class="p-4 text-slate-300 text-xs">${i.task}</td>
+                        <td class="p-4 text-center">
+                            <span class="px-2 py-1 rounded-md border text-[9px] font-black ${statusClass}">
+                                ${i.estado.toUpperCase()}
+                            </span>
+                            ${btnAprobar}
+                        </td>
+                        <td class="p-4 text-right">
+                            ${i.aprobado_por ? `<div class="text-[9px] text-emerald-400 font-bold uppercase mb-1">Aprobado por ${i.aprobado_por}</div>` : ''}
+                            <div class="text-[10px] font-mono text-slate-500 italic">${new Date(i.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Inicio
         loadData();
-        
-        // Auto-refresco cada 10 segundos
-        setInterval(loadData, 10000);
+        setInterval(loadData, 10000); // Auto-refresco cada 10 seg
     </script>
 </body>
 </html>
