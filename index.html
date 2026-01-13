@@ -3,60 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Early Friday Area | Pro</title>
+    <title>Early Friday | All Stars Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
+        select optgroup { background: #0f172a; color: #94a3b8; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <nav class="p-4 glass sticky top-0 z-50 flex justify-between items-center px-8 border-b border-slate-800">
         <div class="flex items-center gap-2">
-            <span class="text-2xl">🚀</span>
+            <span class="text-2xl">🏆</span>
             <h1 class="text-xl font-bold tracking-tight text-white">Early<span class="text-blue-500">Friday</span></h1>
         </div>
         
-        <div class="flex items-center gap-6">
+        <div class="flex items-center gap-4">
             <button onclick="loginJefe()" class="bg-slate-800 hover:bg-slate-700 text-[10px] px-3 py-1.5 rounded-lg border border-slate-700 transition font-bold text-slate-300">
                 🔑 ACCESO JEFE
             </button>
-            <div id="status-dot" class="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold">
-                <span id="dot" class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                <span id="status-text" class="text-slate-500">Desconectado</span>
+            <div id="status-dot" class="flex items-center gap-2 text-[10px] uppercase font-bold">
+                <span id="dot" class="w-2 h-2 bg-red-500 rounded-full"></span>
+                <span id="status-text" class="text-slate-500">...</span>
             </div>
         </div>
     </nav>
 
     <main class="max-w-6xl mx-auto p-6 space-y-6">
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="glass p-5 rounded-3xl border-l-4 border-blue-500 shadow-xl">
-                <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Total Solicitudes</p>
-                <p id="stat-total" class="text-3xl font-bold text-white">0</p>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="glass p-4 rounded-2xl border-l-4 border-blue-500 shadow-xl">
+                <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Total</p>
+                <p id="stat-total" class="text-2xl font-bold text-white">0</p>
             </div>
-            <div class="glass p-5 rounded-3xl border-l-4 border-emerald-500 shadow-xl">
+            <div class="glass p-4 rounded-2xl border-l-4 border-emerald-500 shadow-xl">
                 <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Aprobadas</p>
-                <p id="stat-aprobadas" class="text-3xl font-bold text-emerald-400">0</p>
+                <p id="stat-aprobadas" class="text-2xl font-bold text-emerald-400">0</p>
             </div>
-            <div class="glass p-5 rounded-3xl border-l-4 border-amber-500 shadow-xl">
-                <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Pendientes</p>
-                <p id="stat-pendientes" class="text-3xl font-bold text-amber-400">0</p>
+            <div class="glass p-4 rounded-2xl border-l-4 border-rose-500 shadow-xl">
+                <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Rechazadas</p>
+                <p id="stat-rechazadas" class="text-2xl font-bold text-rose-500">0</p>
+            </div>
+            <div class="glass p-4 rounded-2xl border-l-4 border-yellow-500 shadow-xl overflow-hidden">
+                <p class="text-[10px] text-yellow-500 uppercase font-black mb-1">⭐ Top Salidas</p>
+                <div id="mini-ranking" class="text-[11px] font-bold text-slate-300 truncate italic">Esperando datos...</div>
             </div>
         </div>
 
         <section class="glass rounded-3xl p-6 shadow-2xl border border-slate-800">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                    <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1 ml-1">Mi Nombre</label>
-                    <input id="userName" type="text" placeholder="Tu nombre" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1 ml-1">¿Quién eres?</label>
+                    <select id="userName" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Selecciona tu nombre</option>
+                        <optgroup label="Equipo Hugo">
+                            <option value="Hugo Ramírez">Hugo Ramírez</option>
+                            <option value="José Pisco">José Pisco</option>
+                            <option value="Valeria Cabrera">Valeria Cabrera</option>
+                        </optgroup>
+                        <optgroup label="Equipo Carol">
+                            <option value="Carol Flores">Carol Flores</option>
+                            <option value="Gabriela Lopez">Gabriela Lopez</option>
+                            <option value="Yanira Palomino">Yanira Palomino</option>
+                        </optgroup>
+                        <optgroup label="Equipo Elena">
+                            <option value="Elena Chipana">Elena Chipana</option>
+                            <option value="Leonardo Navarrete">Leonardo Navarrete</option>
+                            <option value="Miguel Atencio">Miguel Atencio</option>
+                        </optgroup>
+                        <optgroup label="Equipo Malú">
+                            <option value="Malú Temoche">Malú Temoche</option>
+                            <option value="Annie Huamani">Annie Huamani</option>
+                        </optgroup>
+                    </select>
                 </div>
                 <div>
                     <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1 ml-1">Mi Equipo</label>
-                    <select id="userTeam" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white outline-none focus:ring-2 focus:ring-blue-500">
+                    <select id="userTeam" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="Hugo">Equipo Hugo</option>
                         <option value="Elena">Equipo Elena</option>
                         <option value="Carol">Equipo Carol</option>
@@ -65,10 +91,10 @@
                 </div>
                 <div>
                     <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1 ml-1">Tarea Finalizada</label>
-                    <input id="userTask" type="text" placeholder="¿Qué terminaste?" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white outline-none focus:ring-2 focus:ring-blue-500">
+                    <input id="userTask" type="text" placeholder="Ej: Reporte de ventas" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div class="flex items-end">
-                    <button onclick="sendToCloud()" id="btn-send" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl transition-all shadow-lg shadow-blue-500/20 active:scale-95">
+                    <button onclick="sendToCloud()" id="btn-send" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl transition-all shadow-lg active:scale-95">
                         Registrar Salida
                     </button>
                 </div>
@@ -78,16 +104,15 @@
         <section class="glass rounded-3xl overflow-hidden shadow-xl border border-slate-800">
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
-                    <thead class="bg-slate-900/80 text-[10px] uppercase text-slate-500 font-black tracking-tighter">
+                    <thead class="bg-slate-900/80 text-[10px] uppercase text-slate-500 font-black">
                         <tr>
                             <th class="p-5">Miembro / Equipo</th>
                             <th class="p-5">Actividad Realizada</th>
-                            <th class="p-5 text-center">Estado de Salida</th>
-                            <th class="p-5 text-right">Hora Registro</th>
+                            <th class="p-5 text-center">Estado / Gestión</th>
+                            <th class="p-5 text-right">Información</th>
                         </tr>
                     </thead>
-                    <tbody id="live-list" class="divide-y divide-slate-800">
-                        </tbody>
+                    <tbody id="live-list" class="divide-y divide-slate-800"></tbody>
                 </table>
             </div>
         </section>
@@ -102,15 +127,20 @@
         const _supabase = supabase.createClient(SB_URL, SB_KEY);
         let jefeActual = null;
 
-        // 1. Cargar Datos
         async function loadData() {
             const dot = document.getElementById('dot');
             const statusText = document.getElementById('status-text');
 
             try {
+                const hoy = new Date();
+                const lunes = new Date(hoy);
+                lunes.setDate(hoy.getDate() - (hoy.getDay() === 0 ? 6 : hoy.getDay() - 1));
+                lunes.setHours(0, 0, 0, 0);
+
                 const { data, error } = await _supabase
                     .from('registros')
                     .select('*')
+                    .gte('created_at', lunes.toISOString())
                     .order('created_at', { ascending: false });
                 
                 if (error) throw error;
@@ -120,20 +150,18 @@
                 statusText.innerText = "Sincronizado";
                 statusText.className = "text-emerald-500";
             } catch (err) {
-                console.error(err);
                 dot.className = "w-2 h-2 bg-red-500 rounded-full animate-pulse";
-                statusText.innerText = "Error de conexión";
+                statusText.innerText = "Error";
             }
         }
 
-        // 2. Enviar Registro
         async function sendToCloud() {
-            let name = document.getElementById('userName').value.trim();
+            let name = document.getElementById('userName').value;
             let task = document.getElementById('userTask').value.trim();
             let equipo = document.getElementById('userTeam').value;
             const btn = document.getElementById('btn-send');
 
-            if(!name || !task) return alert("Completa todos los campos");
+            if(!name || !task) return alert("Por favor selecciona tu nombre y escribe tu tarea.");
 
             btn.disabled = true;
             btn.innerText = "🚀 Enviando...";
@@ -154,7 +182,6 @@
             }
         }
 
-        // 3. Login de Jefe
         function loginJefe() {
             const pin = prompt("Ingresa tu PIN de Jefe:");
             if (pin === "2026") { jefeActual = { nombre: "Malú", rol: "Super" }; alert("Bienvenida Malú"); }
@@ -165,13 +192,12 @@
             loadData();
         }
 
-        // 4. Función Aprobar
-        async function aprobar(id) {
+        async function cambiarEstado(id, nuevoEstado) {
             if (!jefeActual) return;
             try {
                 const { error } = await _supabase
                     .from('registros')
-                    .update({ estado: 'aprobado', aprobado_por: jefeActual.nombre })
+                    .update({ estado: nuevoEstado, aprobado_por: jefeActual.nombre })
                     .eq('id', id);
                 
                 if (error) throw error;
@@ -179,25 +205,42 @@
             } catch (err) { alert(err.message); }
         }
 
-        // 5. Dibujar Tabla
         function render(items) {
             const list = document.getElementById('live-list');
+            
+            // Stats
             document.getElementById('stat-total').innerText = items.length;
             document.getElementById('stat-aprobadas').innerText = items.filter(i => i.estado === 'aprobado').length;
-            document.getElementById('stat-pendientes').innerText = items.filter(i => i.estado === 'pendiente').length;
+            document.getElementById('stat-rechazadas').innerText = items.filter(i => i.estado === 'rechazado').length;
+
+            // Lógica Ranking All-Stars
+            const conteo = {};
+            items.filter(i => i.estado === 'aprobado').forEach(i => {
+                conteo[i.name] = (conteo[i.name] || 0) + 1;
+            });
+            const rankingSorted = Object.entries(conteo).sort((a,b) => b[1] - a[1]).slice(0, 2);
+            document.getElementById('mini-ranking').innerHTML = rankingSorted.length > 0 
+                ? rankingSorted.map(([name, count]) => `🥇 ${name} (${count})`).join(' | ')
+                : "Sin aprobaciones esta semana";
 
             if (items.length === 0) {
-                list.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-600">No hay registros hoy.</td></tr>';
+                list.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-600">No hay registros esta semana.</td></tr>';
                 return;
             }
 
             list.innerHTML = items.map(i => {
-                let statusClass = i.estado === 'aprobado' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-amber-500/10 text-amber-500 border-amber-500/20";
+                let statusClass = "bg-amber-500/10 text-amber-500 border-amber-500/20";
+                if(i.estado === 'aprobado') statusClass = "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
+                if(i.estado === 'rechazado') statusClass = "bg-rose-500/10 text-rose-500 border-rose-500/20";
                 
-                let btnAprobar = "";
+                let acciones = "";
                 if (jefeActual && i.estado === 'pendiente') {
                     if (jefeActual.rol === "Super" || jefeActual.equipo === i.equipo) {
-                        btnAprobar = `<button onclick="aprobar('${i.id}')" class="ml-2 bg-emerald-600 hover:bg-emerald-500 text-white text-[9px] font-bold px-2 py-1 rounded shadow-lg transition-all active:scale-90">APROBAR ✅</button>`;
+                        acciones = `
+                            <div class="flex gap-2 justify-center mt-2">
+                                <button onclick="cambiarEstado('${i.id}', 'aprobado')" class="bg-emerald-600 hover:bg-emerald-500 text-[9px] font-bold px-2 py-1 rounded shadow-lg transition-all active:scale-90">APROBAR ✅</button>
+                                <button onclick="cambiarEstado('${i.id}', 'rechazado')" class="bg-rose-600 hover:bg-rose-500 text-[9px] font-bold px-2 py-1 rounded shadow-lg transition-all active:scale-90">RECHAZAR ❌</button>
+                            </div>`;
                     }
                 }
 
@@ -205,17 +248,17 @@
                     <tr class="hover:bg-slate-700/20 transition-colors">
                         <td class="p-4">
                             <div class="font-bold text-white text-sm">${i.name}</div>
-                            <div class="text-[9px] text-blue-400 uppercase font-black tracking-tighter">EQUIPO ${i.equipo}</div>
+                            <div class="text-[9px] text-blue-400 uppercase font-black italic">EQUIPO ${i.equipo}</div>
                         </td>
                         <td class="p-4 text-slate-300 text-xs">${i.task}</td>
                         <td class="p-4 text-center">
                             <span class="px-2 py-1 rounded-md border text-[9px] font-black ${statusClass}">
                                 ${i.estado.toUpperCase()}
                             </span>
-                            ${btnAprobar}
+                            ${acciones}
                         </td>
                         <td class="p-4 text-right">
-                            ${i.aprobado_por ? `<div class="text-[9px] text-emerald-400 font-bold uppercase mb-1">Aprobado por ${i.aprobado_por}</div>` : ''}
+                            ${i.aprobado_por ? `<div class="text-[9px] text-emerald-400 font-bold uppercase mb-1">Por: ${i.aprobado_por}</div>` : ''}
                             <div class="text-[10px] font-mono text-slate-500 italic">${new Date(i.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
                         </td>
                     </tr>
@@ -223,9 +266,8 @@
             }).join('');
         }
 
-        // Inicio
         loadData();
-        setInterval(loadData, 10000); // Auto-refresco cada 10 seg
+        setInterval(loadData, 15000); 
     </script>
 </body>
 </html>
