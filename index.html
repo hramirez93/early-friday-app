@@ -6,6 +6,8 @@
     <title>Early Friday | All Stars Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
@@ -90,8 +92,8 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1 ml-1">Tarea Finalizada</label>
-                    <input id="userTask" type="text" placeholder="Ej: Reporte de ventas" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1 ml-1">Motivo</label>
+                    <input id="userTask" type="text" placeholder="Ej: Trámite Personal" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div class="flex items-end">
                     <button onclick="sendToCloud()" id="btn-send" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl transition-all shadow-lg active:scale-95">
@@ -201,6 +203,17 @@
                     .eq('id', id);
                 
                 if (error) throw error;
+
+                // --- EFECTO DE CONFETI AL APROBAR ---
+                if (nuevoEstado === 'aprobado') {
+                    confetti({
+                        particleCount: 150,
+                        spread: 70,
+                        origin: { y: 0.6 },
+                        colors: ['#3b82f6', '#10b981', '#f59e0b']
+                    });
+                }
+
                 await loadData();
             } catch (err) { alert(err.message); }
         }
