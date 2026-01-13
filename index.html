@@ -13,6 +13,14 @@
         body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
         select optgroup { background: #0f172a; color: #94a3b8; font-weight: bold; }
+        
+        /* Animación personalizada para el brillo */
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+        }
+        .btn-glow { animation: glow 1.5s infinite; border-color: #3b82f6 !important; }
     </style>
 </head>
 <body>
@@ -24,9 +32,13 @@
         </div>
         
         <div class="flex items-center gap-4">
-            <button onclick="loginJefe()" class="bg-slate-800 hover:bg-slate-700 text-[10px] px-3 py-1.5 rounded-lg border border-slate-700 transition font-bold text-slate-300">
-                🔑 ACCESO JEFE
-            </button>
+            <div class="relative">
+                <button id="btn-jefe" onclick="loginJefe()" class="bg-slate-800 hover:bg-slate-700 text-[10px] px-3 py-1.5 rounded-lg border border-slate-700 transition font-bold text-slate-300 flex items-center gap-2">
+                    🔑 ACCESO JEFE
+                    <span id="badge-count" class="hidden bg-blue-600 text-white text-[9px] px-1.5 py-0.5 rounded-full animate-bounce">0</span>
+                </button>
+            </div>
+
             <div id="status-dot" class="flex items-center gap-2 text-[10px] uppercase font-bold">
                 <span id="dot" class="w-2 h-2 bg-red-500 rounded-full"></span>
                 <span id="status-text" class="text-slate-500">...</span>
@@ -35,7 +47,6 @@
     </nav>
 
     <main class="max-w-6xl mx-auto p-6 space-y-6">
-        
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div class="glass p-4 rounded-2xl border-l-4 border-blue-500 shadow-xl">
                 <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Total</p>
@@ -121,10 +132,8 @@
     </main>
 
     <script>
-        // --- CREDENCIALES ---
         const SB_URL = "https://sexnefbexmhxnakihcov.supabase.co";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNleG5lZmJleG1oeG5ha2loY292Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNTM3MjMsImV4cCI6MjA4MzgyOTcyM30.QSpCGC-1-XzHil1YK15y0MntkPgC0WMzh_i4J-eiJ0I"; 
-        // --------------------
 
         const _supabase = supabase.createClient(SB_URL, SB_KEY);
         let jefeActual = null;
@@ -132,6 +141,8 @@
         async function loadData() {
             const dot = document.getElementById('dot');
             const statusText = document.getElementById('status-text');
+            const btnJefe = document.getElementById('btn-jefe');
+            const badge = document.getElementById('badge-count');
 
             try {
                 const hoy = new Date();
@@ -146,6 +157,17 @@
                     .order('created_at', { ascending: false });
                 
                 if (error) throw error;
+
+                // Lógica de Notificación en tiempo real
+                const pendientes = data.filter(i => i.estado === 'pendiente').length;
+                if (pendientes > 0) {
+                    btnJefe.classList.add('btn-glow');
+                    badge.innerText = pendientes;
+                    badge.classList.remove('hidden');
+                } else {
+                    btnJefe.classList.remove('btn-glow');
+                    badge.classList.add('hidden');
+                }
 
                 render(data || []);
                 dot.className = "w-2 h-2 bg-emerald-500 rounded-full";
@@ -164,7 +186,6 @@
             const btn = document.getElementById('btn-send');
 
             if(!name || !task) return alert("Por favor selecciona tu nombre y escribe tu tarea.");
-
             btn.disabled = true;
             btn.innerText = "🚀 Enviando...";
 
@@ -172,7 +193,6 @@
                 const { error } = await _supabase
                     .from('registros')
                     .insert([{ name, task, equipo, estado: 'pendiente' }]);
-
                 if (error) throw error;
                 document.getElementById('userTask').value = "";
                 await loadData();
@@ -201,32 +221,21 @@
                     .from('registros')
                     .update({ estado: nuevoEstado, aprobado_por: jefeActual.nombre })
                     .eq('id', id);
-                
                 if (error) throw error;
 
-                // --- EFECTO DE CONFETI AL APROBAR ---
                 if (nuevoEstado === 'aprobado') {
-                    confetti({
-                        particleCount: 150,
-                        spread: 70,
-                        origin: { y: 0.6 },
-                        colors: ['#3b82f6', '#10b981', '#f59e0b']
-                    });
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#3b82f6', '#10b981', '#f59e0b'] });
                 }
-
                 await loadData();
             } catch (err) { alert(err.message); }
         }
 
         function render(items) {
             const list = document.getElementById('live-list');
-            
-            // Stats
             document.getElementById('stat-total').innerText = items.length;
             document.getElementById('stat-aprobadas').innerText = items.filter(i => i.estado === 'aprobado').length;
             document.getElementById('stat-rechazadas').innerText = items.filter(i => i.estado === 'rechazado').length;
 
-            // Lógica Ranking All-Stars
             const conteo = {};
             items.filter(i => i.estado === 'aprobado').forEach(i => {
                 conteo[i.name] = (conteo[i.name] || 0) + 1;
@@ -234,7 +243,7 @@
             const rankingSorted = Object.entries(conteo).sort((a,b) => b[1] - a[1]).slice(0, 2);
             document.getElementById('mini-ranking').innerHTML = rankingSorted.length > 0 
                 ? rankingSorted.map(([name, count]) => `🥇 ${name} (${count})`).join(' | ')
-                : "Sin aprobaciones esta semana";
+                : "Sin aprobaciones";
 
             if (items.length === 0) {
                 list.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-600">No hay registros esta semana.</td></tr>';
@@ -280,7 +289,7 @@
         }
 
         loadData();
-        setInterval(loadData, 15000); 
+        setInterval(loadData, 10000); // Actualiza cada 10 seg para mayor respuesta
     </script>
 </body>
 </html>
