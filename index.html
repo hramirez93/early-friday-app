@@ -48,7 +48,7 @@
         
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div class="glass p-4 rounded-2xl border-l-4 border-blue-500 shadow-xl">
-                <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Total</p>
+                <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Registros Hoy</p>
                 <p id="stat-total" class="text-2xl font-bold text-white">0</p>
             </div>
             <div class="glass p-4 rounded-2xl border-l-4 border-emerald-500 shadow-xl">
@@ -65,9 +65,9 @@
             </div>
         </div>
 
-        <section id="fame-wall-section" class="hidden space-y-3">
+        <section id="fame-wall-section" class="space-y-3">
             <h2 class="text-xs font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2 ml-2">
-                <span class="text-yellow-500 text-lg">✨</span> MURO DE LA FAMA (TOP SEMANAL)
+                <span class="text-yellow-500 text-lg">👑</span> HALL OF FAME (MÁXIMAS SALIDAS HISTÓRICAS)
             </h2>
             <div id="fame-wall" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 </div>
@@ -152,20 +152,29 @@
             const badge = document.getElementById('badge-count');
 
             try {
+                // 1. Cargar datos HISTÓRICOS para el Muro de la Fama
+                const { data: allData, error: allErr } = await _supabase
+                    .from('registros')
+                    .select('name, equipo, estado');
+                
+                if (allErr) throw allErr;
+                updateFameWall(allData || []);
+
+                // 2. Cargar datos de la SEMANA ACTUAL para la tabla y stats
                 const hoy = new Date();
                 const lunes = new Date(hoy);
                 lunes.setDate(hoy.getDate() - (hoy.getDay() === 0 ? 6 : hoy.getDay() - 1));
                 lunes.setHours(0, 0, 0, 0);
 
-                const { data, error } = await _supabase
+                const { data: weekData, error: weekErr } = await _supabase
                     .from('registros')
                     .select('*')
                     .gte('created_at', lunes.toISOString())
                     .order('created_at', { ascending: false });
                 
-                if (error) throw error;
+                if (weekErr) throw weekErr;
 
-                const pendientes = data.filter(i => i.estado === 'pendiente').length;
+                const pendientes = weekData.filter(i => i.estado === 'pendiente').length;
                 if (pendientes > 0) {
                     btnJefe.classList.add('btn-glow');
                     badge.innerText = pendientes;
@@ -175,8 +184,7 @@
                     badge.classList.add('hidden');
                 }
 
-                render(data || []);
-                updateFameWall(data || []);
+                render(weekData || []);
                 
                 dot.className = "w-2 h-2 bg-emerald-500 rounded-full";
                 statusText.innerText = "Sincronizado";
@@ -189,12 +197,14 @@
 
         function updateFameWall(items) {
             const wall = document.getElementById('fame-wall');
-            const section = document.getElementById('fame-wall-section');
             
-            // Contar aprobaciones por persona esta semana
+            // Contar aprobaciones por persona (HISTÓRICO)
             const counts = {};
             items.filter(i => i.estado === 'aprobado').forEach(i => {
-                counts[i.name] = { count: (counts[i.name]?.count || 0) + 1, equipo: i.equipo };
+                if (!counts[i.name]) {
+                    counts[i.name] = { count: 0, equipo: i.equipo };
+                }
+                counts[i.name].count++;
             });
 
             const winners = Object.entries(counts)
@@ -202,7 +212,6 @@
                 .slice(0, 3);
 
             if (winners.length > 0) {
-                section.classList.remove('hidden');
                 wall.innerHTML = winners.map(([name, data], idx) => {
                     const icons = ['🥇', '🥈', '🥉'];
                     return `
@@ -211,13 +220,13 @@
                             <div>
                                 <p class="text-[10px] font-black text-blue-400 uppercase tracking-tighter">EQUIPO ${data.equipo}</p>
                                 <p class="text-sm font-bold text-white">${name}</p>
-                                <p class="text-[10px] text-slate-400 font-bold">${data.count} Salidas Aprobadas</p>
+                                <p class="text-[10px] text-slate-300 font-bold">Aprobaciones Totales: ${data.count}</p>
                             </div>
                         </div>
                     `;
                 }).join('');
             } else {
-                section.classList.add('hidden');
+                wall.innerHTML = '<p class="text-slate-500 text-xs italic ml-2">No hay registros históricos aún.</p>';
             }
         }
 
@@ -280,7 +289,7 @@
             document.getElementById('stat-pendientes').innerText = items.filter(i => i.estado === 'pendiente').length;
 
             if (items.length === 0) {
-                list.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-600">No hay registros esta semana.</td></tr>';
+                list.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-600">No hay registros hoy.</td></tr>';
                 return;
             }
 
